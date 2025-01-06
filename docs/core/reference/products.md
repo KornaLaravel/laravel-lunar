@@ -35,13 +35,13 @@ group, or you can state which dates they should be active for (as long as the cu
 ```php
 
 // Will schedule for this product to be enabled in 14 days for this customer group.
-$product->schedule($customerGroup, now()->addDays(14));
+$product->scheduleCustomerGroup($customerGroup, now()->addDays(14));
 
 // Schedule the product to be enabled straight away
-$product->schedule($customerGroup);
+$product->scheduleCustomerGroup($customerGroup);
 
 // The schedule method will accept an array or collection of customer groups.
-$product->schedule(CustomerGroup::get());
+$product->scheduleCustomerGroup(CustomerGroup::get());
 ```
 
 ### Retrieving products for a customer group
@@ -82,7 +82,7 @@ You can associate attributes to a product type like so (it's just a straight
 forward [Polymorphic relationship](https://laravel.com/docs/8.x/eloquent-relationships#many-to-many-polymorphic-relations)).
 
 ```php
-$productType->mappedAttributes()->associate([ /* attribute ids ... */ ]);
+$productType->mappedAttributes()->attach([ /* attribute ids ... */ ]);
 ```
 
 You can associate both `Product` and `ProductVariant` attributes to a product type which will then display on either the
@@ -445,14 +445,15 @@ front end.
 | `priceable_id`      | This is the id of the related model which owns the price                             | `null`  | yes      |
 
 ```php
+$priceable = \Lunar\Models\ProductVariant::create([/** ... */]);
 $price = \Lunar\Models\Price::create([
     'price' => 199,
     'compare_price' => 299,
     'currency_id' => 1,
     'min_quantity' => 1,
     'customer_group_id' => null,
-    'priceable_type' => 'Lunar\Models\ProductVariant',
-    'priceable_id' => 1,
+    'priceable_type' => $priceable->getMorphClass(),
+    'priceable_id' => $priceable->id,
 ]);
 ```
 
@@ -471,14 +472,15 @@ currency in the system. In order to add pricing to a variant, you can either cre
 relationship method.
 
 ```php
+$priceable = \Lunar\Models\ProductVariant::create([/** ... */]);
 \Lunar\Models\Price::create([
     'price' => 199,
     'compare_price' => 299,
     'currency_id' => 1,
     'min_quantity' => 1,
     'customer_group_id' => null,
-    'priceable_type' => 'Lunar\Models\ProductVariant',
-    'priceable_id' => 1,
+    'priceable_type' => $priceable->getMorphClass(),
+    'priceable_id' => $priceable->id,
 ]);
 ```
 
