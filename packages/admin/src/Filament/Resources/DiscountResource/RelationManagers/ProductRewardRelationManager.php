@@ -3,13 +3,14 @@
 namespace Lunar\Admin\Filament\Resources\DiscountResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Lunar\Admin\Support\RelationManagers\BaseRelationManager;
+use Lunar\Facades\ModelManifest;
 use Lunar\Models\Product;
 
-class ProductRewardRelationManager extends RelationManager
+class ProductRewardRelationManager extends BaseRelationManager
 {
     protected static bool $isLazy = false;
 
@@ -25,7 +26,7 @@ class ProductRewardRelationManager extends RelationManager
         return false;
     }
 
-    public function table(Table $table): Table
+    public function getDefaultTable(Table $table): Table
     {
 
         return $table
@@ -38,7 +39,9 @@ class ProductRewardRelationManager extends RelationManager
             ->paginated(false)
             ->modifyQueryUsing(
                 fn ($query) => $query->whereIn('type', ['reward'])
-                    ->wherePurchasableType(Product::class)
+                    ->wherePurchasableType(
+                        ModelManifest::getMorphMapKey(Product::class)
+                    )
                     ->whereHas('purchasable')
             )
             ->headerActions([

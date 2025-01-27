@@ -122,6 +122,10 @@ class DiscountManager implements DiscountManagerInterface
             $this->channel($defaultChannel);
         }
 
+        if ($cart && $customerGroups = $cart->customer?->customerGroups) {
+            $this->customerGroup($customerGroups);
+        }
+
         if ($this->customerGroups->isEmpty() && $defaultGroup = CustomerGroup::getDefault()) {
             $this->customerGroup($defaultGroup);
         }
@@ -137,6 +141,7 @@ class DiscountManager implements DiscountManagerInterface
                 $cart,
                 function ($query, $value) {
                     return $query->where(function ($query) use ($value) {
+
                         return $query->where(fn ($query) => $query->products(
                             $value->lines->pluck('purchasable.product_id')->filter()->values(),
                             ['condition', 'limitation']
